@@ -1,0 +1,36 @@
+---
+title: "Mapping Point and Polygon Data"
+author: "Alton Barbehenn, Andrew Kerkhoff, and Caitlin Redak"
+date: "May 12, 2017"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Once all bioclimatic data has been compiled (point and/or polygon) you can create range maps from the vectors created to visually compare distributions over bioclimatic ranges
+
+To being, plot a blank map. For these purposes, the map can be isolated to the New World. You will also need the maps package
+
+```
+load(maps)
+map('world',xlim = c(-175,-35), ylim = c(-70,90), fill = TRUE, col = "grey")
+```
+Next you can plot your bioclim variable of choice over this map and add point or polygon data to it
+
+```
+plot(bio1)
+points(CircaeaCoord, col = "red", pch = 20, cex = 0.25)
+```
+OR
+
+```
+plot(bio1)
+plot(Circaearange, add=T, col="light green")
+```
+
+From here you can add other taxa, sister taxa, or change bioclimatic variables
+

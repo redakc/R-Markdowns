@@ -1,0 +1,33 @@
+---
+title: "Isolating Sister Taxa"
+author: "Andrew Kerkhoff and Caitlin Redak"
+date: "May 12, 2017"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Creating a list of sister taxa
+
+In addition to the already installed packages, we also will need the following: 
+
+```
+load(base)
+```
+
+To isolate the sister taxa from the phylogenies we have created, we first need to generate a list of the focal and sister clade species. This command accesses the coded tree and creates a vector of all the tip labels from the tree.
+
+```
+Circaeatotal=c(circaeaphy$tip.label)
+```
+
+Next, we can use the "setdiff" function from the "base" package to differentiate the tip labels of the sister taxa from the tip labels of the focal clade, resulting in a list of sister taxa
+
+```
+Circaeasister=setdiff(Circaeatotal, Circaea)
+```
+

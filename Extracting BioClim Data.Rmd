@@ -1,0 +1,94 @@
+---
+title: "Extracting Bioclimatic Data from WorldClim"
+author: "Alton Barbehenn, Andrew Kerkhoff, and Caitlni Redak"
+date: "May 12, 2017"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Downloading WorldClim data 
+
+This section will require the following packages
+
+```
+require(BIEN)
+require(raster)
+require(sp)
+require(rgdal)
+require(rgeos)
+load(mosaic)
+```
+
+First access the WorldClim site at http://www.worldclim.org/bioclim 
+
+Here you can download bioclimatic variables that best fit your research needs at the resolution you like."Bio 1" for example is mean temperature. Be sure to download both ".bil" and ".hdr" files and load them into your project file. You can then load them into the global environment individually using the following: 
+
+```
+bio1=raster("bio1.bil")
+```
+
+It is recommended that you divid the file by 10 because all bioclim variables are stored in integers 10X that of actual values. 
+
+```
+bio1<-bio1/10
+```
+##Compiling Point Occurance data 
+
+You can extract single observations of the focal clade to map with bioclimatic data using the following within the BIEN package. This is done by first creating a dataframe and vector with just observations of species, coordinated by latitude and logitude.  
+
+```
+Circaeaoccurrence<-BIEN_occurrence_genus("Circaea")
+CircaeaCoord=subset(Circaeaoccurrence, latitude & longitude)
+```
+
+From here you can extract the bioclimatic record for each point, getting data, like mean temperature,for each occurance you have extracted and store it in a vector . This will work best if we eliminate all coordinates which are missing first.
+
+
+```
+length(sum(is.na(CircaeaCoord$longitude)))
+sum(is.na(CircaeaCoord$longitude))
+CircaeaCoord=subset(CircaeaCoord, is.na(longitude)==0, drop=TRUE)
+bio1_Circaea_data = extract(bio1, CircaaeaCoord)
+CircaeaCoord=as.data.frame(CircaeaCoord)
+```
+
+You can visualize the distribution of biolclimatic values holistically or by species with the following: 
+
+```
+hist(bio1_Ceanothus_data)
+histogram(~bio1|scrubbed_species_binomial, data=CircaeaCoord)
+```
+
+
+##Compiling Polygon Occurance Data
+
+Instead of point observations, you can generate raster files, or polygons, that show the area of the species coverage. This is good for getting an idea of the spatial range of a focal taxa. 
+
+Polygons can be generated using the BIEN package and the focal clade taxa and sister taxa vectors you generated from trees. 
+
+```
+Circaearange<-BIEN_ranges_load_species(Circaea)
+Circaeasisterrange<-BIEN_ranges_load_species(Circaeasister)
+```
+
+Extracting bioclimatic data for a polygon is similar to point data however takes significantly more time since data will be downloaded for every cell covered by the entire taxa range, not just single observations. Be sure to take this into account before running this code, especially if running multiple taxa and bioclimatic variables at once, since it could take hours. 
+
+```
+bio1_Circaeapolygon_data = extract(bio1, Circaearange)
+bio1_Circaeasisterpolygon_data = extract(bio1, Circaeasisterrange)
+```
+
+Data files for polygons can be obtained by first "unlisting" the polygon, since it will be grouped by species, and then creating a vector of values. Using the "summary" command allows you to get a sense of the range. 
+
+```
+unlist(bio1_Circaeapolygon_data)
+bio1_Circaeapolygon=unlist(bio1_Circaeapolygon_data)
+summary(bio1_Circaeapolygon)
+```
+
+These commands can be used for all bioclim variables and focal clades needed. 

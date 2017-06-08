@@ -1,0 +1,80 @@
+---
+title: "Subsetting a Tree"
+author: "Andrew Kerkhoff and Caitlin Redak"
+date: "May 9, 2017"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Obtaining cladistic data
+
+First, install and load the following packages
+
+```
+library(BIEN)
+library(ape)
+library(geiger)
+library(phytools)
+```
+
+Once you have a focal candidate clade selected, you can extract the species or genera from the BIEN into a separate data frame.
+
+First, extract the appropriate taxa and create a vector for this. We will use the vector later to build trees. For this example we will use the genera level, but this can be done at species, genus, or family.
+
+We will use Circaea, the nightshades, as an example
+
+```
+BIEN_taxonomy_genus("Circaea")
+Circaea<-c("Circaea")
+Circaea=BIEN_taxonomy_genus("Circaea")
+```
+Be sure to check the dataframe to ensure it contains the desired species.This will take a varying amount of time depending on the size of the clade you have selected. 
+
+Then we need to extract just the species binomial list from this vector:
+
+```
+Circaeaspecies=as.vector(Circaea$scrubbed_species_binomial)
+```
+
+
+##Extracting tree for the focal clade
+
+We can extract the phylogenetic tree of the focal clade containing the sister taxa as an outgroup using the following function:
+
+```
+ext.clade.sister=function(phy, tips){
+  require(ape)
+  require(geiger)
+  require(phytools)
+  mrca.focal=getMRCA(phy, tips)
+  mrca.sister=getSisters(phy, mrca.focal)
+  mrca.both=getMRCA(phy, c(tips(phy,mrca.focal), tips(phy, mrca.sister)))
+  ext.clade=extract.clade(phy, mrca.both)
+  return(ext.clade)
+}
+```
+
+This fucntion utilizes the base phylogeny, and subsets out the clade you selected. It then finds the next node back from the node unifying your clade, and uses all taxa connected via that node as the outgroup, thus providing a sister taxa. 
+
+When it is time to utilize this, after the function has been loaded into the environment it can be entered as follows, providing you with a phylogeny in the environment for future use: 
+
+```
+Circaeaphy=ext.clade.sister(phylos, Circaea)
+```
+
+This tree can be plotted as follows:
+
+```{r pressure, echo=FALSE}
+plot(Circaeaphy, cex=0.5)
+```
+
+Here the "cex" command codes for text size. Other manipulations and visualitons (like edge labels, tip and node numbers) for the tree can be found using the "phytools" package. 
+
+You should now have a phylogeny file (of class phylo) and tree depicting the focal clade and its sister 
+
+

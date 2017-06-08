@@ -1,0 +1,42 @@
+---
+title: "Creating Phylogenies Using BIEN"
+author: "Andrew Kerkhoff and Caitlin Redak"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Accessing BIEN
+
+To create phylogenies and pull desired taxa you will need the following packages: 
+
+```
+library(BIEN)
+library(maps)
+library(sp)
+library(ape)
+```
+
+Because any sub-phylogenies created will be trimmed from the existing phylogeny in the BIEN database, you first need to download the complete BIEN phylogeny. It is important to note that we are downloading the "complete" phylogeny, not the "conservative" phylogeny. The "conservative" phylogeny includes only those taxa with molecular data. We want all the taxa represented in the database. 
+
+```
+phylos<-BIEN_phylogeny_complete(n_phylogenies = 1, seed=NULL, replicates = 100)
+```
+
+This command will take a while because of the size of the phylogeny. Once the phylogeny is downloaded, save it to the environment so that you do not need to download this again. You can then plot the phylogeny, see the coded structure, edge matrix, and tip labels using the following commands, respectively.
+
+```
+plot(phylos)
+str(phylos)
+phylos$edge
+phylos$tip.label
+```
+
+
+
+
